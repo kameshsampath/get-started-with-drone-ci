@@ -1,0 +1,44 @@
+kind: pipeline
+type: docker
+name: default
+
+services:
+  - name: mariadb
+    image: mariadb
+    volumes:
+      - name: dbinit-scripts
+        path: /docker-entrypoint-initdb.d
+
+steps:
+  - name: wait for db 
+    image: mariadb
+    commands:
+      - until mariadb-admin --host=$MARIADB_HOST --user=$MARIADB_USER --password=$MARIADB_PASSWORD --port=3306 ping; do sleep 3; done;
+ 
+  - name: test
+    image: golang
+    commands:
+     - go test -v
+
+  - name: build
+    image: golang
+    commands:
+      - go build -o server server.go 
+
+  - name: image
+    image: plugins/docker
+    settings:
+      daemon_off: true
+      registry: localhost:5001
+      repo: localhost:5001/example/posts-app
+    volumes:
+      - name: docker-sock
+        path: /var/run/docker.sock
+
+volumes:
+  - name: docker-sock
+    host:
+      path: /var/run/docker.sock
+  - name: dbinit-scripts
+    host:
+      path: /Users/kameshs/MyLabs/golang/devfest-sil-ci-demo/data

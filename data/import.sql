@@ -1,0 +1,6 @@
+CREATE OR REPLACE TABLE postsdb.posts (
+   id MEDIUMINT NOT NULL AUTO_INCREMENT,
+   name CHAR(50),
+   text VARCHAR(255),
+   PRIMARY KEY (id)
+);

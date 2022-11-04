@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+  mariadb:
+    image: mariadb
+    env_file:
+      - .env
+    volumes:
+      - ./data:/docker-entrypoint-initdb.d
+  posts-app:
+    image: localhost:5001/example/posts-app
+    env_file:
+      - .env
+    depends_on:
+      - mariadb
+    ports:
+      - "8080:8080"
+networks:
+  posts-app:
+  
